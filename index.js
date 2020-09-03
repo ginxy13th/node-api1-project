@@ -1,7 +1,7 @@
 const express = require('express');
 const shortid = require('shortid');
 const server = express();
-const port = 5678;
+const port = process.env.PORT || 5678;
 
 server.listen(port, () => console.log('server up'));
 
@@ -16,7 +16,7 @@ let users = [{
         bio: "Not Tarzan's Wife, another Jane",  // String, required
 }]
 
-server.post('/users', (req,res) => {
+server.post('/api/users', (req,res) => {
     const user = req.body
     if( !user.name  || !user.bio){
         res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
@@ -41,7 +41,7 @@ server.get('/api/users/:id', (req, res) => {
     } 
 })
 
-server.get('/users', (req,res) => {
+server.get('/api/users', (req,res) => {
     if(users.length === 0 || users === undefined ){
         res.status(500).json( { errorMessage: "The users information could not be retrieved." })
    } else{
@@ -50,14 +50,13 @@ server.get('/users', (req,res) => {
 })
 
 server.delete("/api/users/:id", (req,res) => {
-    const {id} = req.params
+    const id = req.params.id
     users = users.filter(  u => u.id !== id)
     if (!users) {
         res.status(500).json({
             errorMessage: "The user could not be removed"
         })
-    }
-    if(!users.id ){
+    } else if(!users.id ){
         res.status(404).json({message: "The user with the specified ID does not exist."});
     }else{
         res.status(204).end()
